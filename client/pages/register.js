@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { SyncOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 const Register = () => {
   const [name, setName] = useState("mayer");
@@ -29,7 +30,7 @@ const Register = () => {
 
   return (
     <>
-      <h1 className="jumbotron text-center bg-primary square">Register</h1>
+      <h1 className="jumbotron text-center bg-primary square">가입하기</h1>
       <div className="container col-md-4 offset-md-4 pb-5">
         <form onSubmit={handleSubmit}>
           <input
@@ -37,7 +38,7 @@ const Register = () => {
             className="form-control mb-4 p-4"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter name"
+            placeholder="이름을 입력하세요"
             required
           />
 
@@ -46,7 +47,7 @@ const Register = () => {
             className="form-control mb-4 p-4"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter email"
+            placeholder="이메일을 입력하세요"
             required
           />
 
@@ -55,7 +56,7 @@ const Register = () => {
             className="form-control mb-4 p-4"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
+            placeholder="비밀번호를 입력하세요"
             required
           />
 
@@ -67,6 +68,13 @@ const Register = () => {
             {loading ? <SyncOutlined spin /> : "Submit"}
           </button>
         </form>
+
+        <p className="text-center p-3">
+          이미 가입하셨나요?{" "}
+          <Link href="/login">
+            <a>로그인</a>
+          </Link>
+        </p>
       </div>
     </>
   );
