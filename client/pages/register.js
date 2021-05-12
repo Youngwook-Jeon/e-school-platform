@@ -42,7 +42,7 @@ const Register = () => {
           <input
             type="password"
             className="form-control mb-4 p-4"
-            value={name}
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password"
             required
