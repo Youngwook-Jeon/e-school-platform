@@ -55,3 +55,13 @@ export const login = async (req, res) => {
     return res.status(400).send("에러가 발생했습니다. 다시 시도하여 주세요.");
   }
 };
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    return res.json({ message: "로그아웃되었습니다."});
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("에러가 발생했습니다. 다시 시도하여 주세요.");
+  }
+}
