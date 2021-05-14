@@ -59,9 +59,20 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     res.clearCookie("token");
-    return res.json({ message: "로그아웃되었습니다."});
+    return res.json({ message: "로그아웃되었습니다." });
   } catch (err) {
     console.log(err);
     return res.status(400).send("에러가 발생했습니다. 다시 시도하여 주세요.");
   }
-}
+};
+
+export const currentUser = async (req, res) => {
+  try {
+    const userInDb = await User.findById(req.user._id)
+      .select("-password")
+      .exec();
+    return res.json(userInDb);
+  } catch (err) {
+    console.log(err);
+  }
+};
