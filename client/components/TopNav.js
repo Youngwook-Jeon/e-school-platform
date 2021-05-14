@@ -3,6 +3,7 @@ import { Menu } from "antd";
 import Link from "next/link";
 import {
   AppstoreOutlined,
+  CoffeeOutlined,
   LoginOutlined,
   LogoutOutlined,
   UserAddOutlined,
@@ -12,12 +13,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 
-const { Item } = Menu;
+const { Item, SubMenu } = Menu;
 
 const TopNav = () => {
   const [current, setCurrent] = useState("");
 
   const { state, dispatch } = useContext(Context);
+  const { user } = state;
   const router = useRouter();
 
   useEffect(() => {
@@ -47,33 +49,40 @@ const TopNav = () => {
           </Link>
         </Item>
 
-        <Item
-          key="/login"
-          onClick={(e) => setCurrent(e.key)}
-          icon={<LoginOutlined />}
-        >
-          <Link href="/login">
-            <a>로그인</a>
-          </Link>
-        </Item>
+        {user === null && (
+          <>
+            <Item
+              key="/login"
+              onClick={(e) => setCurrent(e.key)}
+              icon={<LoginOutlined />}
+            >
+              <Link href="/login">
+                <a>로그인</a>
+              </Link>
+            </Item>
 
-        <Item
-          key="/register"
-          onClick={(e) => setCurrent(e.key)}
-          icon={<UserAddOutlined />}
-        >
-          <Link href="/register">
-            <a>가입</a>
-          </Link>
-        </Item>
+            <Item
+              key="/register"
+              onClick={(e) => setCurrent(e.key)}
+              icon={<UserAddOutlined />}
+            >
+              <Link href="/register">
+                <a>가입</a>
+              </Link>
+            </Item>
+          </>
+        )}
 
-        <Item
-          onClick={logout}
-          icon={<LogoutOutlined />}
-          className="float-right"
-        >
-          로그아웃
-        </Item>
+        {user !== null && (
+          <SubMenu icon={<CoffeeOutlined />} title={user.name} className="float-right">
+            <Item
+              onClick={logout}
+              className="float-right"
+            >
+              로그아웃
+            </Item>
+          </SubMenu>
+        )}
       </Menu>
     </>
   );
