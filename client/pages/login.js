@@ -1,10 +1,10 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { SyncOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { Context } from "../context";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 
 const Login = () => {
   const [email, setEmail] = useState("ela870116@gmail.com");
@@ -13,9 +13,14 @@ const Login = () => {
 
   // state
   const { state, dispatch } = useContext(Context);
+  const { user } = state;
 
   // router
   const router = useRouter();
+
+  useEffect(() => {
+    if (user !== null) router.push("/");
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
