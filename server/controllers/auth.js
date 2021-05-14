@@ -71,7 +71,10 @@ export const currentUser = async (req, res) => {
     const userInDb = await User.findById(req.user._id)
       .select("-password")
       .exec();
-    return res.json(userInDb);
+    if (userInDb) {
+      return res.json({ ok: true });
+    }
+    return res.status(400).send("잘못된 요청입니다.");
   } catch (err) {
     console.log(err);
   }
