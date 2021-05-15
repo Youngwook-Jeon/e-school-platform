@@ -32,6 +32,9 @@ const Register = () => {
       });
 
       toast.success("가입이 성공했습니다. 로그인을 하세요.");
+      setName("");
+      setEmail("");
+      setPassword("");
       setLoading(false);
     } catch (err) {
       toast.error(err.response.data);

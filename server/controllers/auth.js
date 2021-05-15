@@ -177,3 +177,25 @@ export const forgotPassword = async (req, res) => {
     console.log(err);
   }
 };
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+    const hashedPassword = await hashPassword(newPassword);
+    const user = User.findOneAndUpdate(
+      {
+        email,
+        passwordResetCode: code,
+      },
+      {
+        password: hashedPassword,
+        passwordResetCode: "",
+      }
+    ).exec();
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("에러가 발생했습니다. 다시 시도하여 주세요.");
+  }
+};
