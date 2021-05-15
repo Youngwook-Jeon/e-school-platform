@@ -1,8 +1,8 @@
 import User from "../models/user";
 import { hashPassword, comparePassword } from "../utils/auth";
 import jwt from "jsonwebtoken";
-import user from "../models/user";
 import AWS from "aws-sdk";
+import { nanoid } from "nanoid";
 
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -126,4 +126,54 @@ export const sendTestEmail = async (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const shortCode = nanoid(8).toUpperCase();
+    const user = await User.findOneAndUpdate(
+      { email },
+      { passwordResetCode: shortCode }
+    );
+
+    if (!user) return res.status(400).send("해당하는 유저를 찾을 수 없습니다.");
+
+    const params = {
+      Source: process.env.EMAIL_FROM,
+      Destination: {
+        ToAddresses: [email],
+      },
+      Message: {
+        Body: {
+          Html: {
+            Charset: "UTF-8",
+            Data: `
+              <html>
+                <h1>비밀번호 재설정</h1>
+                <p>비밀번호 재설정을 위해 다음 코드를 복사하여 사용하세요.</p>
+                <h2 style="color:red;">${shortCode}</h2>
+                <i>eshool.com</i>
+              </html>
+            `,
+          },
+        },
+        Subject: {
+          Charset: "UTF-8",
+          Data: "비밀번호 재설정",
+        },
+      },
+    };
+
+    const emailSent = SES.sendEmail(params).promise();
+    emailSent
+      .then((data) => {
+        res.json({ ok: true });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } catch (err) {
+    console.log(err);
+  }
 };

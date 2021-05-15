@@ -76,10 +76,17 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="text-center p-3">
+        <p className="text-center pt-3">
           아직 계정이 없으시다면?{" "}
           <Link href="/register">
-            <a>가입</a>
+            <a>가입하기</a>
+          </Link>
+        </p>
+
+        <p className="text-center">
+          비밀번호가 기억나지 않으신다면?{" "}
+          <Link href="/forgot-password">
+            <a className="text-danger">재설정하기</a>
           </Link>
         </p>
       </div>

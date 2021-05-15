@@ -83,7 +83,7 @@ const Register = () => {
         <p className="text-center p-3">
           이미 가입하셨나요?{" "}
           <Link href="/login">
-            <a>로그인</a>
+            <a>로그인하기</a>
           </Link>
         </p>
       </div>
