@@ -28,3 +28,29 @@ export const makeInstructor = async (req, res) => {
     res.status(400).send("에러가 발생했습니다. 다시 시도하여 주세요.");
   }
 };
+
+export const getAccountStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).exec();
+    const account = await stripe.accounts.retrieve(user.stripe_account_id);
+
+    if (!account.charges_enabled) {
+      return res.status(401).send("접근 권한이 없습니다.");
+    } else {
+      const statusUpdated = await User.findByIdAndUpdate(
+        user._id,
+        {
+          stripe_seller: account,
+          $addToSet: { role: "Instructor" },
+        },
+        { new: true }
+      )
+        .select("-password")
+        .exec();
+
+      res.json(statusUpdated);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
