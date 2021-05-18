@@ -40,7 +40,7 @@ const TopNav = () => {
 
   return (
     <>
-      <Menu mode="horizontal" selectedKeys={[current]}>
+      <Menu mode="horizontal" selectedKeys={[current]} className="mb-2">
         <Item
           key="/"
           onClick={(e) => setCurrent(e.key)}
@@ -113,6 +113,19 @@ const TopNav = () => {
               <Item onClick={logout}>로그아웃</Item>
             </ItemGroup>
           </SubMenu>
+        )}
+
+        {user && user.role && user.role.includes("Instructor") && (
+          <Item
+            key="/instructor"
+            onClick={(e) => setCurrent(e.key)}
+            icon={<TeamOutlined />}
+            className="float-right"
+          >
+            <Link href="/instructor">
+              <a>선생님</a>
+            </Link>
+          </Item>
         )}
       </Menu>
     </>
