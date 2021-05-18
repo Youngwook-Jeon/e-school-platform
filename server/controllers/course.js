@@ -45,3 +45,24 @@ export const uploadImage = async (req, res) => {
     return res.status(400).send("에러가 발생했습니다. 다시 시도해 주세요.");
   }
 };
+
+export const removeImage = async (req, res) => {
+  try {
+    const { image } = req.body;
+    const params = {
+      Bucket: image.Bucket,
+      Key: image.Key,
+    };
+
+    S3.deleteObject(params, (err, data) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(400);
+      }
+
+      res.send({ ok: true });
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
