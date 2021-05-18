@@ -9,6 +9,7 @@ const CourseCreateForm = ({
   values,
   setValues,
   preview,
+  uploadButtonText,
 }) => {
   const children = [];
   for (let i = 10000; i <= 100000; i += 10000) {
@@ -85,7 +86,7 @@ const CourseCreateForm = ({
         <div className="col">
           <div className="form-group">
             <label className="btn btn-outline-secondary w-100 text-left">
-              {values.loading ? "업로딩..." : "이미지 업로드"}
+              {uploadButtonText}
 
               <input
                 type="file"

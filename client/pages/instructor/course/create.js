@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import InstructorRoute from "../../../components/routes/InstructorRoute";
 import CourseCreateForm from "../../../components/forms/CourseCreateForm";
+import Resizer from "react-image-file-resizer";
+import { toast } from "react-toastify";
 
 const CreateCourse = () => {
   const [values, setValues] = useState({
@@ -14,14 +16,32 @@ const CreateCourse = () => {
     loading: false,
   });
 
+  const [image, setImage] = useState("");
   const [preview, setPreview] = useState("");
+  const [uploadButtonText, setUploadButtonText] = useState("이미지 업로드하기");
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const handleImage = (e) => {
-    setPreview(window.URL.createObjectURL(e.target.files[0]))
+    let file = e.target.files[0];
+    setPreview(window.URL.createObjectURL(file));
+    setUploadButtonText(file.name);
+    setValues({ ...values, loading: true });
+
+    Resizer.imageFileResizer(file, 720, 500, "JPEG", 100, 0, async (uri) => {
+      try {
+        let { data } = await axios.post("/api/course/upload-image", {
+          image: uri,
+        });
+        console.log(data);
+        setValues({ ...values, loading: false });
+      } catch (err) {
+        setValues({ ...values, loading: false });
+        toast.error("이미지 업로드에 실패했습니다. 다시 시도해 주세요.");
+      }
+    });
   };
 
   const handleSubmit = (e) => {
@@ -40,6 +60,7 @@ const CreateCourse = () => {
           values={values}
           setValues={setValues}
           preview={preview}
+          uploadButtonText={uploadButtonText}
         />
       </div>
     </InstructorRoute>
