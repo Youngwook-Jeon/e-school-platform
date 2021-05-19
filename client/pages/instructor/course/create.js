@@ -4,6 +4,7 @@ import InstructorRoute from "../../../components/routes/InstructorRoute";
 import CourseCreateForm from "../../../components/forms/CourseCreateForm";
 import Resizer from "react-image-file-resizer";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const CreateCourse = () => {
   const [values, setValues] = useState({
@@ -19,6 +20,8 @@ const CreateCourse = () => {
   const [image, setImage] = useState({});
   const [preview, setPreview] = useState("");
   const [uploadButtonText, setUploadButtonText] = useState("이미지 업로드하기");
+
+  const router = useRouter();
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -61,6 +64,16 @@ const CreateCourse = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const { data } = await axios.post("/api/course", {
+        ...values,
+        image,
+      });
+      toast.success("강좌가 성공적으로 개설되었습니다. 이제 강의들을 추가해 주세요.");
+      router.push("/instructor");
+    } catch (err) {
+      toast.error(err.response.data);
+    }
   };
 
   return (

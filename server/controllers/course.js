@@ -66,3 +66,7 @@ export const removeImage = async (req, res) => {
     console.log(err);
   }
 };
+
+export const create = async (req, res) => {
+  
+}
