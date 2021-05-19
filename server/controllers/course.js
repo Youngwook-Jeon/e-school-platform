@@ -1,5 +1,7 @@
 import AWS from "aws-sdk";
 import { nanoid } from "nanoid";
+import Course from "../models/course";
+import slugify from "slugify";
 
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -68,5 +70,24 @@ export const removeImage = async (req, res) => {
 };
 
 export const create = async (req, res) => {
-  
-}
+  try {
+    const alreadyExistCourse = await Course.findOne({
+      slug: slugify(req.body.name.toLowerCase()),
+    });
+    if (alreadyExistCourse)
+      return res.status(400).send("이미 존재하는 강좌 이름입니다.");
+
+    const course = await new Course({
+      slug: slugify(req.body.name),
+      instructor: req.user._id,
+      ...req.body,
+    }).save();
+
+    res.json(course);
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(400)
+      .send("강좌 개설이 실패했습니다. 다시 시도해 주세요.");
+  }
+};
