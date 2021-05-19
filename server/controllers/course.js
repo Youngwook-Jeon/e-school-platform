@@ -91,3 +91,14 @@ export const create = async (req, res) => {
       .send("강좌 개설이 실패했습니다. 다시 시도해 주세요.");
   }
 };
+
+export const read = async (req, res) => {
+  try {
+    const course = await Course.findOne({ slug: req.params.slug })
+      .populate("instructor", "_id name")
+      .exec();
+    res.json(course);
+  } catch (err) {
+    console.log(err);
+  }
+};

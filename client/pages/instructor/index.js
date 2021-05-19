@@ -29,14 +29,14 @@ const InstructorIndex = () => {
             <div className="media pt-2">
               <Avatar
                 size={80}
-                src={course.image ? course.image.Location : "/course.png"}
+                src={course.image ? course.image.Location : "/course.jpg"}
               />
 
               <div className="media-body pl-2">
                 <div className="row">
                   <div className="col">
                     <Link
-                      href={`/instructor/course/view/${course._id}`}
+                      href={`/instructor/course/view/${course.slug}`}
                       className="pointer"
                     >
                       <a className="h5 mt-2 text-primary">
