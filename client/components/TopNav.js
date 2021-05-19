@@ -123,7 +123,7 @@ const TopNav = () => {
             className="float-right"
           >
             <Link href="/instructor">
-              <a>선생님</a>
+              <a>선생님 메뉴</a>
             </Link>
           </Item>
         )}
