@@ -6,6 +6,7 @@ import { Avatar, Tooltip, Button, Modal } from "antd";
 import { EditOutlined, CheckOutlined, UploadOutlined } from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import AddLessonForm from "../../../../components/forms/AddLessonForm";
+import { toast } from "react-toastify";
 
 const CourseView = () => {
   const [course, setCourse] = useState({});
@@ -13,10 +14,11 @@ const CourseView = () => {
   const [values, setValues] = useState({
     title: "",
     content: "",
-    video: "",
+    video: {},
   });
   const [uploading, setUploading] = useState(false);
   const [uploadButtonText, setUploadButtonText] = useState("동영상 업로드하기");
+  const [progress, setProgress] = useState(0);
 
   const router = useRouter();
   const { slug } = router.query;
@@ -35,9 +37,43 @@ const CourseView = () => {
     console.log(values);
   };
 
-  const handleVideo = (e) => {
-    const file = e.target.files[0];
-    setUploadButtonText(file.name);
+  const handleVideo = async (e) => {
+    try {
+      setUploading(true);
+      const file = e.target.files[0];
+      setUploadButtonText(file.name);
+
+      const videoData = new FormData();
+      videoData.append("video", file);
+      const { data } = await axios.post("/api/course/video-upload", videoData, {
+        onUploadProgress: (e) => {
+          setProgress(Math.round((100 * e.loaded) / e.total));
+        },
+      });
+
+      setValues({ ...values, video: data });
+      setUploading(false);
+    } catch (err) {
+      setUploading(false);
+      toast.error("동영상 업로드가 실패했습니다. 다시 시도해 주세요.");
+    }
+  };
+
+  const handleVideoRemove = async () => {
+    try {
+      setUploading(true);
+      const { data } = await axios.post(
+        "/api/course/video-remove",
+        values.video
+      );
+      setValues({ ...values, video: {} });
+      setProgress(0);
+      setUploading(false);
+      setUploadButtonText("다른 동영상 업로드하기");
+    } catch (err) {
+      setUploading(false);
+      toast.error("동영상 제거가 실패했습니다. 다시 시도해 주세요.");
+    }
   };
 
   return (
@@ -112,6 +148,8 @@ const CourseView = () => {
                 uploading={uploading}
                 uploadButtonText={uploadButtonText}
                 handleVideo={handleVideo}
+                progress={progress}
+                handleVideoRemove={handleVideoRemove}
               />
             </Modal>
           </div>
