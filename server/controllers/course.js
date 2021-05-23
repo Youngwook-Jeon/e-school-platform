@@ -185,3 +185,22 @@ export const addLesson = async (req, res) => {
     return res.status(400).send("강의 추가에 실패했습니다.");
   }
 };
+
+export const update = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const course = await Course.findOne({ slug }).exec();
+    if (req.user._id != course.instructor) {
+      return res.status(400).send("접근 권한이 없습니다.");
+    }
+
+    const updated = await Course.findOneAndUpdate({ slug }, req.body, {
+      new: true,
+    }).exec();
+
+    res.json(updated);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send(err.message);
+  }
+};

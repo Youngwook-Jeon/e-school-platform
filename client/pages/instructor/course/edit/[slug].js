@@ -31,6 +31,7 @@ const EditCourse = () => {
   const loadCourse = async () => {
       const { data } = await axios.get(`/api/course/${slug}`);
       setValues(data);
+      if (data && data.image) setImage(data.image);
   }
 
   const handleChange = (e) => {
@@ -58,10 +59,24 @@ const EditCourse = () => {
     });
   };
 
+  const handleImageRemove = async () => {
+    setValues({ ...values, loading: true });
+    try {
+      const res = await axios.post("/api/course/remove-image", { image });
+      setImage({});
+      setPreview("");
+      setUploadButtonText("이미지 업로드하기");
+      setValues({ ...values, loading: false });
+    } catch (err) {
+      setValues({ ...values, loading: false });
+      toast.error("이미지 삭제가 실패했습니다. 다시 시도해 주세요.");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.put("/api/course", {
+      const { data } = await axios.put(`/api/course/${slug}`, {
         ...values,
         image,
       });
@@ -84,6 +99,7 @@ const EditCourse = () => {
           setValues={setValues}
           preview={preview}
           uploadButtonText={uploadButtonText}
+          handleImageRemove={handleImageRemove}
           editPage={true}
         />
       </div>
