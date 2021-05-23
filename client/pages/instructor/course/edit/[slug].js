@@ -5,6 +5,7 @@ import CourseCreateForm from "../../../../components/forms/CourseCreateForm";
 import Resizer from "react-image-file-resizer";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { List, Avatar } from "antd";
 
 const EditCourse = () => {
   const [values, setValues] = useState({
@@ -15,6 +16,7 @@ const EditCourse = () => {
     paid: true,
     category: "",
     loading: false,
+    lessons: [],
   });
 
   const [image, setImage] = useState({});
@@ -26,13 +28,13 @@ const EditCourse = () => {
 
   useEffect(() => {
     loadCourse();
-  }, [])
+  }, []);
 
   const loadCourse = async () => {
-      const { data } = await axios.get(`/api/course/${slug}`);
-      setValues(data);
-      if (data && data.image) setImage(data.image);
-  }
+    const { data } = await axios.get(`/api/course/${slug}`);
+    if (data) setValues(data);
+    if (data && data.image) setImage(data.image);
+  };
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -86,6 +88,27 @@ const EditCourse = () => {
     }
   };
 
+  const handleDrag = (e, index) => {
+    e.dataTransfer.setData("itemIndex", index);
+  };
+
+  const handleDrop = async (e, index) => {
+    const movingItemIndex = e.dataTransfer.getData("itemIndex");
+    const targetItemIndex = index;
+    let allLessons = values.lessons;
+    let movingItem = allLessons[movingItemIndex];
+    allLessons.splice(movingItemIndex, 1); // remove 1 item from the given index
+    allLessons.splice(targetItemIndex, 0, movingItem);
+
+    setValues({ ...values, lessons: [...allLessons] });
+
+    const { data } = await axios.put(`/api/course/${slug}`, {
+      ...values,
+      image,
+    });
+    toast.success("강의가 재정렬되었습니다.");
+  };
+
   return (
     <InstructorRoute>
       <h1 className="jumbotron text-center square">강좌 업데이트</h1>
@@ -102,6 +125,31 @@ const EditCourse = () => {
           handleImageRemove={handleImageRemove}
           editPage={true}
         />
+      </div>
+      <hr />
+
+      <div className="row pb-5">
+        <div className="col lesson-list">
+          <h4>{values && values.lessons && values.lessons.length} 강의들</h4>
+
+          <List
+            onDragOver={(e) => e.preventDefault()}
+            itemLayout="horizontal"
+            dataSource={values && values.lessons}
+            renderItem={(item, index) => (
+              <List.Item
+                draggable
+                onDragStart={(e) => handleDrag(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+              >
+                <List.Item.Meta
+                  avatar={<Avatar>{index + 1}</Avatar>}
+                  title={item.title}
+                ></List.Item.Meta>
+              </List.Item>
+            )}
+          ></List>
+        </div>
       </div>
     </InstructorRoute>
   );
