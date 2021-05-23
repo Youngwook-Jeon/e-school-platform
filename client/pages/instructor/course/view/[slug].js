@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import InstructorRoute from "../../../../components/routes/InstructorRoute";
 import axios from "axios";
-import { Avatar, Tooltip, Button, Modal } from "antd";
+import { Avatar, Tooltip, Button, Modal, List } from "antd";
 import { EditOutlined, CheckOutlined, UploadOutlined } from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import AddLessonForm from "../../../../components/forms/AddLessonForm";
@@ -119,7 +119,12 @@ const CourseView = () => {
 
                   <div className="d-flex pt-4">
                     <Tooltip title="Edit">
-                      <EditOutlined className="h5 pointer text-warning mr-4" />
+                      <EditOutlined
+                        onClick={() =>
+                          router.push(`/instructor/course/edit/${slug}`)
+                        }
+                        className="h5 pointer text-warning mr-4"
+                      />
                     </Tooltip>
 
                     <Tooltip title="Publish">
@@ -169,6 +174,27 @@ const CourseView = () => {
                 handleVideoRemove={handleVideoRemove}
               />
             </Modal>
+
+            <div className="row pb-5">
+              <div className="col lesson-list">
+                <h4>
+                  {course && course.lessons && course.lessons.length} 강의
+                </h4>
+
+                <List
+                  itemLayout="horizontal"
+                  dataSource={course && course.lessons}
+                  renderItem={(item, index) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        avatar={<Avatar>{index + 1}</Avatar>}
+                        title={item.title}
+                      ></List.Item.Meta>
+                    </List.Item>
+                  )}
+                ></List>
+              </div>
+            </div>
           </div>
         )}
       </div>
