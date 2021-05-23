@@ -106,6 +106,9 @@ export const read = async (req, res) => {
 
 export const uploadVideo = async (req, res) => {
   try {
+    if (req.user._id != req.params.instructorId) {
+      return res.status(400).send("접근 권한이 없습니다.");
+    }
     const { video } = req.files;
     if (!video) return res.status(400).send("비디오 파일이 없습니다.");
 
@@ -133,6 +136,9 @@ export const uploadVideo = async (req, res) => {
 
 export const removeVideo = async (req, res) => {
   try {
+    if (req.user._id != req.params.instructorId) {
+      return res.status(400).send("접근 권한이 없습니다.");
+    }
     const { Bucket, Key } = req.body;
 
     const params = {
@@ -151,5 +157,31 @@ export const removeVideo = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
+  }
+};
+
+export const addLesson = async (req, res) => {
+  try {
+    const { slug, instructorId } = req.params;
+    const { title, content, video } = req.body;
+
+    if (req.user._id != instructorId) {
+      return res.status(400).send("접근 권한이 없습니다.");
+    }
+
+    const updated = await Course.findOneAndUpdate(
+      { slug },
+      {
+        $push: { lessons: { title, content, video, slug: slugify(title) } },
+      },
+      { new: true }
+    )
+      .populate("instructor", "_id name")
+      .exec();
+
+    res.json(updated);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("강의 추가에 실패했습니다.");
   }
 };

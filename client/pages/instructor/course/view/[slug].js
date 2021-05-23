@@ -32,9 +32,22 @@ const CourseView = () => {
     setCourse(data);
   };
 
-  const handleAddLesson = (e) => {
+  const handleAddLesson = async (e) => {
     e.preventDefault();
-    console.log(values);
+    try {
+      const { data } = await axios.post(
+        `/api/course/lesson/${slug}/${course.instructor._id}`,
+        values
+      );
+      setValues({ ...values, title: "", content: "", video: {} });
+      setVisible(false);
+      setUploadButtonText("동영상 업로드하기");
+      setCourse(data);
+      toast.success("강의가 추가되었습니다.");
+    } catch (err) {
+      console.log(err);
+      toast.error("강의 업로드가 실패했습니다. 다시 시도해 주세요.");
+    }
   };
 
   const handleVideo = async (e) => {
@@ -45,11 +58,15 @@ const CourseView = () => {
 
       const videoData = new FormData();
       videoData.append("video", file);
-      const { data } = await axios.post("/api/course/video-upload", videoData, {
-        onUploadProgress: (e) => {
-          setProgress(Math.round((100 * e.loaded) / e.total));
-        },
-      });
+      const { data } = await axios.post(
+        `/api/course/video-upload/${course.instructor._id}`,
+        videoData,
+        {
+          onUploadProgress: (e) => {
+            setProgress(Math.round((100 * e.loaded) / e.total));
+          },
+        }
+      );
 
       setValues({ ...values, video: data });
       setUploading(false);
@@ -63,7 +80,7 @@ const CourseView = () => {
     try {
       setUploading(true);
       const { data } = await axios.post(
-        "/api/course/video-remove",
+        `/api/course/video-remove/${course.instructor._id}`,
         values.video
       );
       setValues({ ...values, video: {} });
