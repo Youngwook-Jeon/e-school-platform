@@ -5,8 +5,9 @@ import CourseCreateForm from "../../../../components/forms/CourseCreateForm";
 import Resizer from "react-image-file-resizer";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-import { List, Avatar } from "antd";
+import { List, Avatar, Modal } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
+import UpdateLessonForm from "../../../../components/forms/UpdateLessonForm";
 
 const EditCourse = () => {
   const [values, setValues] = useState({
@@ -23,6 +24,12 @@ const EditCourse = () => {
   const [image, setImage] = useState({});
   const [preview, setPreview] = useState("");
   const [uploadButtonText, setUploadButtonText] = useState("이미지 업로드하기");
+  const [visible, setVisible] = useState(false);
+  const [current, setCurrent] = useState({});
+  const [uploadVideoButtonText, setUploadVideoButtonText] =
+    useState("동영상 업로드하기");
+  const [progress, setProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   const router = useRouter();
   const { slug } = router.query;
@@ -117,8 +124,11 @@ const EditCourse = () => {
     const removed = allLessons.splice(index, 1);
     setValues({ ...values, lessons: allLessons });
     const { data } = await axios.put(`/api/course/${slug}/${removed[0]._id}`);
+  };
 
-  }
+  const handleVideo = () => {};
+
+  const handleUpdateLesson = () => {};
 
   return (
     <InstructorRoute>
@@ -154,6 +164,10 @@ const EditCourse = () => {
                 onDrop={(e) => handleDrop(e, index)}
               >
                 <List.Item.Meta
+                  onClick={() => {
+                    setVisible(true);
+                    setCurrent(item);
+                  }}
                   avatar={<Avatar>{index + 1}</Avatar>}
                   title={item.title}
                 ></List.Item.Meta>
@@ -167,6 +181,24 @@ const EditCourse = () => {
           ></List>
         </div>
       </div>
+
+      <Modal
+        title="강의 업데이트"
+        centered
+        visible={visible}
+        onCancel={() => setVisible(false)}
+        footer={null}
+      >
+        <UpdateLessonForm
+          current={current}
+          setCurrent={setCurrent}
+          handleVideo={handleVideo}
+          handleUpdateLesson={handleUpdateLesson}
+          uploadVideoButtonText={uploadVideoButtonText}
+          progress={progress}
+          uploading={uploading}
+        />
+      </Modal>
     </InstructorRoute>
   );
 };
