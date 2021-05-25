@@ -126,9 +126,56 @@ const EditCourse = () => {
     const { data } = await axios.put(`/api/course/${slug}/${removed[0]._id}`);
   };
 
-  const handleVideo = () => {};
+  const handleVideo = async (e) => {
+    if (current.video && current.video.Location) {
+      const res = await axios.post(
+        `/api/course/video-remove/${values.instructor._id}`,
+        current.video
+      );
+    }
 
-  const handleUpdateLesson = () => {};
+    const file = e.target.files[0];
+    setUploadVideoButtonText(file.name);
+    setUploading(true);
+    const videoData = new FormData();
+    videoData.append("video", file);
+    videoData.append("courseId", values._id);
+
+    const { data } = await axios.post(
+      `/api/course/video-upload/${values.instructor._id}`,
+      videoData,
+      {
+        onUploadProgress: (e) =>
+          setProgress(Math.round((100 * e.loaded) / e.total)),
+      }
+    );
+    setCurrent({ ...current, video: data });
+    setUploading(false);
+  };
+
+  const handleUpdateLesson = async (e) => {
+    try {
+      e.preventDefault();
+      const { data } = await axios.put(
+        `/api/course/lesson/${slug}/${current._id}`,
+        current
+      );
+      setUploadVideoButtonText("동영상 업로드하기");
+      setVisible(false);
+
+      // update ui
+      if (data.ok) {
+        let arr = values.lessons;
+        const index = arr.findIndex((elm) => elm._id === current._id);
+        arr[index] = current;
+        setValues({ ...values, lessons: arr });
+        toast.success("강의가 업데이트되었습니다.");
+      }
+    } catch (err) {
+      setVisible(false);
+      toast.error("강의 업데이트가 실패했습니다. 다시 시도해 주세요.");
+    }
+  };
 
   return (
     <InstructorRoute>

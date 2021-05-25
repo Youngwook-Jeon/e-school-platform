@@ -218,3 +218,33 @@ export const removeLesson = async (req, res) => {
 
   res.json({ ok: true });
 };
+
+export const updateLesson = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { _id, title, content, video, free_preview } = req.body;
+    const course = await Course.findOne({ slug }).select("instructor").exec();
+
+    if (course.instructor._id != req.user._id) {
+      return res.status(400).send("접근 권한이 없습니다.");
+    }
+
+    const updated = await Course.updateOne(
+      { "lessons._id": _id },
+      {
+        $set: {
+          "lessons.$.title": title,
+          "lessons.$.content": content,
+          "lessons.$.video": video,
+          "lessons.$.free_preview": free_preview,
+        },
+      },
+      { new: true }
+    ).exec();
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("강의 업데이트가 실패했습니다.");
+  }
+};
