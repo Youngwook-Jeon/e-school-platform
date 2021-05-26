@@ -288,3 +288,10 @@ export const unpublishCourse = async (req, res) => {
     return res.status(400).send("강의를 닫는것에 실패했습니다.");
   }
 };
+
+export const courses = async (req, res) => {
+  const allCourses = await Course.find({ published: true })
+    .populate("instructor", "_id name")
+    .exec();
+  res.json(allCourses);
+};

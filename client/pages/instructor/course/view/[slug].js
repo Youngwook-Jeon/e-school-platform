@@ -46,8 +46,9 @@ const CourseView = () => {
         values
       );
       setValues({ ...values, title: "", content: "", video: {} });
-      setVisible(false);
+      setProgress(0);
       setUploadButtonText("동영상 업로드하기");
+      setVisible(false);
       setCourse(data);
       toast.success("강의가 추가되었습니다.");
     } catch (err) {

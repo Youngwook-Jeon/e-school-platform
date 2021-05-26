@@ -18,6 +18,7 @@ const AddLessonForm = ({
           type="text"
           className="form-control square"
           onChange={(e) => setValues({ ...values, title: e.target.value })}
+          value={values.title}
           placeholder="주제"
           autoFocus
           required

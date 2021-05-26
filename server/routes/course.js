@@ -20,7 +20,10 @@ import {
   updateLesson,
   publishCourse,
   unpublishCourse,
+  courses,
 } from "../controllers/course";
+
+router.get("/courses", courses);
 
 router.post("/course/upload-image", uploadImage);
 router.post("/course/remove-image", removeImage);
