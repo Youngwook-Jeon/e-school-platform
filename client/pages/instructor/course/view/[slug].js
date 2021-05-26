@@ -99,13 +99,31 @@ const CourseView = () => {
     }
   };
 
-  const handlePublish = (e, courseId) => {
+  const handlePublish = async (e, courseId) => {
+    try {
+      let answer = window.confirm("이 강좌를 퍼블리시하시겠습니까?");
+      if (!answer) return;
+      const { data } = await axios.put(`/api/course/publish/${courseId}`)
+      setCourse(data);
+      toast.success("강좌가 성공적으로 공개되었습니다!");
+    } catch (err) {
+      toast.error("퍼블리시에 실패했습니다. 다시 시도해 주세요.");
+    }
+  };
 
-  }
-
-  const handleUnpublish = (e, courseId) => {
-    
-  }
+  const handleUnpublish = async (e, courseId) => {
+    try {
+      let answer = window.confirm(
+        "더이상 수강생을 받을 수 없도록 이 강좌를 닫으시겠습니까?"
+      );
+      if (!answer) return;
+      const { data } = await axios.put(`/api/course/unpublish/${courseId}`)
+      setCourse(data);
+      toast.success("강좌를 닫았습니다.");
+    } catch (err) {
+      toast.error("강좌를 닫는 시도가 실패했습니다. 다시 시도해 주세요.");
+    }
+  };
 
   return (
     <InstructorRoute>
@@ -147,11 +165,17 @@ const CourseView = () => {
                       </Tooltip>
                     ) : course.published ? (
                       <Tooltip title="Unpublish">
-                        <CloseOutlined onClick={e => handleUnpublish(e, course._id)} className="h5 pointer text-danger" />
+                        <CloseOutlined
+                          onClick={(e) => handleUnpublish(e, course._id)}
+                          className="h5 pointer text-danger"
+                        />
                       </Tooltip>
                     ) : (
                       <Tooltip title="Publish">
-                        <CheckOutlined onClick={e => handlePublish(e, course._id)} className="h5 pointer text-success" />
+                        <CheckOutlined
+                          onClick={(e) => handlePublish(e, course._id)}
+                          className="h5 pointer text-success"
+                        />
                       </Tooltip>
                     )}
                   </div>

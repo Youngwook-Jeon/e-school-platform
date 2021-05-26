@@ -248,3 +248,43 @@ export const updateLesson = async (req, res) => {
     return res.status(400).send("강의 업데이트가 실패했습니다.");
   }
 };
+
+export const publishCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId).select("instructor").exec();
+    if (course.instructor._id != req.user._id) {
+      return res.status(400).send("접근 권한이 없습니다.");
+    }
+
+    const updated = await Course.findByIdAndUpdate(
+      courseId,
+      { published: true },
+      { new: true }
+    ).exec();
+    res.json(updated);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("퍼블리시에 실패했습니다.");
+  }
+};
+
+export const unpublishCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId).select("instructor").exec();
+    if (course.instructor._id != req.user._id) {
+      return res.status(400).send("접근 권한이 없습니다.");
+    }
+
+    const updated = await Course.findByIdAndUpdate(
+      courseId,
+      { published: false },
+      { new: true }
+    ).exec();
+    res.json(updated);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("강의를 닫는것에 실패했습니다.");
+  }
+};
