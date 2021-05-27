@@ -5,6 +5,7 @@ import SingleCourseJumbotron from "../../components/cards/SingleCourseJumbotron"
 import PreviewModal from "../../components/modal/PreviewModal";
 import SingleCourseLessons from "../../components/cards/SingleCourseLessons";
 import { Context } from "../../context";
+import { toast } from "react-toastify";
 
 const SingleCourse = ({ course }) => {
   // const router = useRouter();
@@ -17,6 +18,8 @@ const SingleCourse = ({ course }) => {
     state: { user },
   } = useContext(Context);
 
+  const router = useRouter();
+
   useEffect(() => {
     if (user && course) checkEnrollment();
   }, [user, course]);
@@ -24,11 +27,26 @@ const SingleCourse = ({ course }) => {
   const checkEnrollment = async () => {
     const { data } = await axios.get(`/api/check-enrollment/${course._id}`);
     setEnrolled(data);
-  }
+  };
 
   const handlePaidEnrollment = () => {};
 
-  const handleFreeEnrollment = () => {};
+  const handleFreeEnrollment = async (e) => {
+    e.preventDefault();
+    try {
+      if (!user) router.push("/login");
+      if (enrolled.status)
+        return router.push(`/user/course/${enrolled.course.slug}`);
+      setLoading(true);
+      const { data } = await axios.post(`/api/free-enrollment/${course._id}`);
+      toast.success(data.message);
+      setLoading(false);
+      router.push(`/user/course/${data.course.slug}`);
+    } catch (err) {
+      toast.error("등록에 실패했습니다. 다시 시도해 주세요.");
+      setLoading(false);
+    }
+  };
 
   return (
     <>

@@ -311,3 +311,26 @@ export const checkEnrollment = async (req, res) => {
     course: await Course.findById(courseId).exec(),
   });
 };
+
+export const freeEnrollment = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.courseId).exec();
+    if (course.paid) return;
+
+    await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $addToSet: { courses: course._id },
+      },
+      { new: true }
+    ).exec();
+    
+    res.json({
+      message: "이 강좌에 성공적으로 등록했습니다.",
+      course,
+    });
+  } catch (err) {
+    console.log("무료 강좌 등록 에러: ", err);
+    return res.status(400).send("등록에 실패했습니다.");
+  }
+};
