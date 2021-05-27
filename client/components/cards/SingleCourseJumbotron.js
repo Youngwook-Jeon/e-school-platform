@@ -13,6 +13,8 @@ const SingleCourseJumbotron = ({
   user,
   handlePaidEnrollment,
   handleFreeEnrollment,
+  enrolled,
+  setEnrolled,
 }) => {
   const {
     name,
@@ -96,7 +98,7 @@ const SingleCourseJumbotron = ({
               disabled={loading}
               onClick={paid ? handlePaidEnrollment : handleFreeEnrollment}
             >
-              {user ? "등록하기" : "등록하기 위해 로그인하기"}
+              {user ? (enrolled.status ? "강의로 이동하기" : "등록하기") : "등록하기 위해 로그인하기"}
             </Button>
           )}
         </div>
