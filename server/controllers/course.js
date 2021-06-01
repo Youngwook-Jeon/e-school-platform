@@ -377,3 +377,25 @@ export const paidEnrollment = async (req, res) => {
     return res.status(400).send("등록에 실패했습니다.");
   }
 };
+
+export const stripeSuccess = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.courseId).exec();
+    const user = await User.findById(req.user._id).exec();
+    if (!user.stripeSession.id) return res.sendStatus(400);
+    const session = await stripe.checkout.sessions.retrieve(
+      user.stripeSession.id
+    );
+    if (session.payment_status === "paid") {
+      await User.findByIdAndUpdate(user._id, {
+        $addToSet: { courses: course._id },
+        $set: { stripeSession: {} },
+      }).exec();
+    }
+
+    res.json({ success: true, course });
+  } catch (err) {
+    console.log("stripe success error occurred: ", err);
+    res.json({ success: false });
+  }
+};
