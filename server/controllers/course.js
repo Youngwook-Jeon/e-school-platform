@@ -4,6 +4,7 @@ import Course from "../models/course";
 import slugify from "slugify";
 import { readFileSync } from "fs";
 import User from "../models/user";
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -324,13 +325,55 @@ export const freeEnrollment = async (req, res) => {
       },
       { new: true }
     ).exec();
-    
+
     res.json({
       message: "이 강좌에 성공적으로 등록했습니다.",
       course,
     });
   } catch (err) {
     console.log("무료 강좌 등록 에러: ", err);
+    return res.status(400).send("등록에 실패했습니다.");
+  }
+};
+
+export const paidEnrollment = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.courseId)
+      .populate("instructor")
+      .exec();
+
+    if (!course.paid) return;
+    // platform fee 30%
+    const fee = (course.price * 30) / 100;
+    // create stripe session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          name: course.name,
+          amount: Math.round(course.price.toFixed(2)),
+          currency: "krw",
+          quantity: 1,
+        },
+      ],
+      payment_intent_data: {
+        application_fee_amount: Math.round(fee.toFixed(2)),
+        transfer_data: {
+          destination: course.instructor.stripe_account_id,
+        },
+      },
+      // redirect url after successful payment
+      success_url: `${process.env.STRIPE_SUCCESS_URL}/${course._id}`,
+      cancel_url: process.env.STRIPE_CANCEL_URL,
+    });
+
+    console.log("session id: ", session);
+    await User.findByIdAndUpdate(req.user._id, {
+      stripeSession: session,
+    }).exec();
+    res.send(session.id);
+  } catch (err) {
+    console.log("paid enrollment error occurred: ", err);
     return res.status(400).send("등록에 실패했습니다.");
   }
 };
