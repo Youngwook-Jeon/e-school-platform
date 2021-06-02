@@ -1,0 +1,55 @@
+import { useState, useEffect, useContext } from "react";
+import { Context } from "../../context";
+import InstructorRoute from "../../components/routes/InstructorRoute";
+import axios from "axios";
+import {
+  DollarOutlined,
+  SettingOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
+import { currencyFormatter } from "../../utils/helpers";
+
+const InstructorRevenue = () => {
+  const [balance, setBalance] = useState({ pending: [] });
+
+  useEffect(() => {
+    sendBalanceRequest();
+  }, []);
+
+  const sendBalanceRequest = async () => {};
+
+  const handlePayoutSettings = async () => {
+
+  }
+
+  return (
+    <InstructorRoute>
+      <div className="container">
+        <div className="row pt-2">
+          <div className="col-md-8 offset-md-2 bg-light p-5">
+            <h2>
+              수업료 현황 <DollarOutlined className="float-right" />
+            </h2>
+            <small>48시간 이내에 당신의 stripe 계좌로 입금됩니다.</small>
+            <hr />
+            <h4>
+              대기중인 금액 <span className="float-right">50.00</span>
+            </h4>
+            <small>For 48 hours</small>
+            <hr />
+            <h4>
+              지불금{" "}
+              <SettingOutlined
+                className="float-right pointer"
+                onClick={handlePayoutSettings}
+              />
+            </h4>
+            <small>당신의 stripe 계좌 정보를 업데이트 하거나 이전의 지불 정보를 확인하세요.</small>
+          </div>
+        </div>
+      </div>
+    </InstructorRoute>
+  );
+};
+
+export default InstructorRevenue;

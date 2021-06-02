@@ -25,6 +25,16 @@ const InstructorNav = () => {
           강의 만들기
         </a>
       </Link>
+
+      <Link href="/instructor/revenue">
+        <a
+          className={`nav-link ${
+            current === "/instructor/revenue" && "active"
+          }`}
+        >
+          강의 수입 확인하기
+        </a>
+      </Link>
     </div>
   );
 };

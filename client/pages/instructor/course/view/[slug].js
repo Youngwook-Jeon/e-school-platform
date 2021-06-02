@@ -9,6 +9,7 @@ import {
   UploadOutlined,
   QuestionOutlined,
   CloseOutlined,
+  UserSwitchOutlined,
 } from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import AddLessonForm from "../../../../components/forms/AddLessonForm";
@@ -25,6 +26,7 @@ const CourseView = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadButtonText, setUploadButtonText] = useState("동영상 업로드하기");
   const [progress, setProgress] = useState(0);
+  const [students, setStudents] = useState(0);
 
   const router = useRouter();
   const { slug } = router.query;
@@ -32,6 +34,17 @@ const CourseView = () => {
   useEffect(() => {
     loadCourse();
   }, [slug]);
+
+  useEffect(() => {
+    course && studentCount();
+  }, [course]);
+
+  const studentCount = async () => {
+    const { data } = await axios.post(`/api/instructor/student-count`, {
+      courseId: course._id,
+    });
+    setStudents(data.length);
+  };
 
   const loadCourse = async () => {
     const { data } = await axios.get(`/api/course/${slug}`);
@@ -104,7 +117,7 @@ const CourseView = () => {
     try {
       let answer = window.confirm("이 강좌를 퍼블리시하시겠습니까?");
       if (!answer) return;
-      const { data } = await axios.put(`/api/course/publish/${courseId}`)
+      const { data } = await axios.put(`/api/course/publish/${courseId}`);
       setCourse(data);
       toast.success("강좌가 성공적으로 공개되었습니다!");
     } catch (err) {
@@ -118,7 +131,7 @@ const CourseView = () => {
         "더이상 수강생을 받을 수 없도록 이 강좌를 닫으시겠습니까?"
       );
       if (!answer) return;
-      const { data } = await axios.put(`/api/course/unpublish/${courseId}`)
+      const { data } = await axios.put(`/api/course/unpublish/${courseId}`);
       setCourse(data);
       toast.success("강좌를 닫았습니다.");
     } catch (err) {
@@ -151,6 +164,10 @@ const CourseView = () => {
                   </div>
 
                   <div className="d-flex pt-4">
+                    <Tooltip title={`${students} 명이 수강중입니다.`}>
+                      <UserSwitchOutlined className="h5 pointer text-info mr-4" />
+                    </Tooltip>
+
                     <Tooltip title="Edit">
                       <EditOutlined
                         onClick={() =>
