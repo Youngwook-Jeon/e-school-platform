@@ -5,12 +5,16 @@ import axios from "axios";
 import {
   DollarOutlined,
   SettingOutlined,
-  LoadingOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
-import { currencyFormatter, stripeCurrencyFormatter } from "../../utils/helpers";
+import {
+  currencyFormatter,
+  stripeCurrencyFormatter,
+} from "../../utils/helpers";
 
 const InstructorRevenue = () => {
   const [balance, setBalance] = useState({ pending: [] });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     sendBalanceRequest();
@@ -21,7 +25,16 @@ const InstructorRevenue = () => {
     setBalance(data);
   };
 
-  const handlePayoutSettings = async () => {};
+  const handlePayoutSettings = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get("/api/instructor/payout-settings");
+      window.location.href = data;
+    } catch (err) {
+      setLoading(false);
+      alert("지불 정보 설정에 접근이 실패했습니다. 다시 시도해주세요.");
+    }
+  };
 
   return (
     <InstructorRoute>
@@ -46,10 +59,14 @@ const InstructorRevenue = () => {
             <hr />
             <h4>
               지불금{" "}
-              <SettingOutlined
-                className="float-right pointer"
-                onClick={handlePayoutSettings}
-              />
+              {!loading ? (
+                <SettingOutlined
+                  className="float-right pointer"
+                  onClick={handlePayoutSettings}
+                />
+              ) : (
+                <SyncOutlined spin className="float-right pointer" />
+              )}
             </h4>
             <small>
               당신의 stripe 계좌 정보를 업데이트 하거나 이전의 지불 정보를
