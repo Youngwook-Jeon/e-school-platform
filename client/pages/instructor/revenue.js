@@ -7,7 +7,7 @@ import {
   SettingOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
-import { currencyFormatter } from "../../utils/helpers";
+import { currencyFormatter, stripeCurrencyFormatter } from "../../utils/helpers";
 
 const InstructorRevenue = () => {
   const [balance, setBalance] = useState({ pending: [] });
@@ -16,11 +16,12 @@ const InstructorRevenue = () => {
     sendBalanceRequest();
   }, []);
 
-  const sendBalanceRequest = async () => {};
+  const sendBalanceRequest = async () => {
+    const { data } = await axios.get("/api/instructor/balance");
+    setBalance(data);
+  };
 
-  const handlePayoutSettings = async () => {
-
-  }
+  const handlePayoutSettings = async () => {};
 
   return (
     <InstructorRoute>
@@ -33,7 +34,13 @@ const InstructorRevenue = () => {
             <small>48시간 이내에 당신의 stripe 계좌로 입금됩니다.</small>
             <hr />
             <h4>
-              대기중인 금액 <span className="float-right">50.00</span>
+              대기중인 금액
+              {balance.pending &&
+                balance.pending.map((bp, i) => (
+                  <span key={i} className="float-right">
+                    {stripeCurrencyFormatter(bp)}
+                  </span>
+                ))}
             </h4>
             <small>For 48 hours</small>
             <hr />
@@ -44,7 +51,10 @@ const InstructorRevenue = () => {
                 onClick={handlePayoutSettings}
               />
             </h4>
-            <small>당신의 stripe 계좌 정보를 업데이트 하거나 이전의 지불 정보를 확인하세요.</small>
+            <small>
+              당신의 stripe 계좌 정보를 업데이트 하거나 이전의 지불 정보를
+              확인하세요.
+            </small>
           </div>
         </div>
       </div>
