@@ -30,6 +30,13 @@ const SingleCourse = () => {
     setCourse(data);
   };
 
+  const markCompleted = async () => {
+    const { data } = await axios.post(`/api/mark-completed`, {
+      courseId: course._id,
+      lessonId: course.lessons[clicked]._id,
+    });
+  };
+
   return (
     <StudentRoute>
       <div className="row">
@@ -61,6 +68,12 @@ const SingleCourse = () => {
         <div className="col">
           {clicked !== -1 ? (
             <>
+              <div className="col alert alert-primary square">
+                <b>{course.lessons[clicked].title.substring(0, 30)}</b>
+                <span className="float-right pointer" onClick={markCompleted}>
+                  수강완료 표시하기
+                </span>
+              </div>
               {course.lessons[clicked].video &&
                 course.lessons[clicked].video.Location && (
                   <>
